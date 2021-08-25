@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Form, Container, Row, Col, Card } from 'react-bootstrap';
 import axios from 'axios';
+import CustomCard from '../../components/Card/customCard.component';
+import InputBox from '../../components/inputBox/inputBox.componenet';
+import { withRouter } from "react-router";
+import { useHistory } from "react-router-dom";
+
 const Home = () => {
+    let history = useHistory();
     const [searchable, setSearchable] = useState("")
     const [responseData, setResponseData] = useState()
     const handleClick = (e) => {
@@ -20,9 +26,11 @@ const Home = () => {
                 'x-rapidapi-key': 'a5f09c23e3mshbef91246228b851p132e37jsn7645aadf1ef6'
             }
         };
+     
         axios.request(options).then(function (response) {
             // console.log('response.data',response.data);
             setResponseData(response.data)
+            sessionStorage.setItem('covid-data',JSON.stringify(response.data))
         }).catch(function (error) {
             console.error(error);
         });
@@ -42,7 +50,7 @@ const Home = () => {
                 <Col lg={2} xs={2}></Col>
 
                 <Col xs={8}>
-                    <Form.Control size="lg" value={searchable} placeholder="Search..." type="text" onKeyDown={(e) => handleClick(e)} onChange={(e) => setSearchable(e.target.value)} />
+                    <InputBox inputValue={searchable} keyDown={(e) => handleClick(e)} change={(e) => setSearchable(e.target.value)}  />
                     {
                         returnResponseData(responseData)
                     }
@@ -53,57 +61,18 @@ const Home = () => {
                 {
                     responseData && responseData.length > 0 && <>
                         <Col>
-                            <Card  >
-                                <Card.Body>
-                                    <Card.Title>Confirmed</Card.Title>
-                                    {/* <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle> */}
-                                    <Card.Text className="mb-2 text-muted">
-                                        {responseData[0].confirmed}
-                                    </Card.Text>
-                                    {/* <Card.Link href="#">Card Link</Card.Link>
-                            <Card.Link href="#">Another Link</Card.Link> */}
-                                </Card.Body>
-                            </Card>
+                        <CustomCard variant="warning" Title="Confirmed" Data={responseData[0].confirmed} onClick={e=>history.push(`/description/${e.target.name}`)} />
+                           
                         </Col>
                         <Col>
-                            <Card  >
-                                <Card.Body>
-                                    <Card.Title>Critical</Card.Title>
-                                    <Card.Subtitle className="mb-2 text-muted"> {responseData[0].critical}</Card.Subtitle>
-                                    {/* <Card.Text>
-                                Some quick example text to build on the card title and make up the bulk of
-                                the card's content.
-                            </Card.Text>
-                            <Card.Link href="#">Card Link</Card.Link>
-                            <Card.Link href="#">Another Link</Card.Link> */}
-                                </Card.Body>
-                            </Card></Col>
+                        <CustomCard  variant="danger" Title="Critical" Data={responseData[0].critical} onClick={e=>history.push(`/description/${e.target.name}`)} />
+                        </Col>
                         <Col>
-                            <Card  >
-                                <Card.Body>
-                                    <Card.Title>Deaths</Card.Title>
-                                    <Card.Subtitle className="mb-2 text-muted"> {responseData[0].deaths}</Card.Subtitle>
-                                    {/* <Card.Text>
-                                Some quick example text to build on the card title and make up the bulk of
-                                the card's content.
-                            </Card.Text>
-                            <Card.Link href="#">Card Link</Card.Link>
-                            <Card.Link href="#">Another Link</Card.Link> */}
-                                </Card.Body>
-                            </Card></Col>
+                        <CustomCard variant="secondary" Title="Deaths" Data={responseData[0].deaths} onClick={e=>history.push(`/description/${e.target.name}`)}/>
+                            </Col>
                         <Col>
-                            <Card  >
-                                <Card.Body>
-                                    <Card.Title>recovered</Card.Title>
-                                    <Card.Subtitle className="mb-2 text-muted">{responseData[0].deaths}</Card.Subtitle>
-                                    {/* <Card.Text>
-                                Some quick example text to build on the card title and make up the bulk of
-                                the card's content.
-                            </Card.Text>
-                            <Card.Link href="#">Card Link</Card.Link>
-                            <Card.Link href="#">Another Link</Card.Link> */}
-                                </Card.Body>
-                            </Card></Col>
+                        <CustomCard  variant="success" Title="Recovered" Data={responseData[0].deaths} onClick={e=>history.push(`/description/${e.target.name}`)}/>
+                            </Col>
                     </>
                 }
 
@@ -114,7 +83,7 @@ const Home = () => {
     </>);
 }
 
-export default Home;
+export default withRouter(Home);
 
 
 // "country":"Italy"
